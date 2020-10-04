@@ -83,7 +83,6 @@ public class APITests {
                 .log().all()
                 .extract().response();
         List<Integer> jsonResponse = response.jsonPath().getList("data.year");
-        System.out.println(jsonResponse);
         //сравниваем отсортированный jsonResponse, с тем, который получили
         Assert.assertEquals(jsonResponse.stream().sorted().collect(Collectors.toList()), jsonResponse);
 
