@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,17 +17,24 @@ import static org.hamcrest.Matchers.*;
 
 public class APITests {
 
+    private static final String AVATAR_ID_7 = "https://s3.amazonaws.com/uifaces/faces/twitter/follettkyle/128.jpg";
+    private static final String AVATAR_ID_8 = "https://s3.amazonaws.com/uifaces/faces/twitter/araa3185/128.jpg";
+    private static final String AVATAR_ID_9 = "https://s3.amazonaws.com/uifaces/faces/twitter/vivekprvr/128.jpg";
+    private static final String AVATAR_ID_10 = "https://s3.amazonaws.com/uifaces/faces/twitter/russoedu/128.jpg";
+    private static final String AVATAR_ID_11 = "https://s3.amazonaws.com/uifaces/faces/twitter/mrmoiree/128.jpg";
+    private static final String AVATAR_ID_12 = "https://s3.amazonaws.com/uifaces/faces/twitter/hebertialmeida/128.jpg";
+
 
     @Test
     public void avatarOfUsers() {
         Specifications.installSpec(Specifications.requestSpec(), Specifications.responseSpecOK());
-        Map<String, String> avatar = new HashMap<String, String>();
-        avatar.put("id7", "https://s3.amazonaws.com/uifaces/faces/twitter/follettkyle/128.jpg");
-        avatar.put("id8", "https://s3.amazonaws.com/uifaces/faces/twitter/araa3185/128.jpg");
-        avatar.put("id9", "https://s3.amazonaws.com/uifaces/faces/twitter/vivekprvr/128.jpg");
-        avatar.put("id10", "https://s3.amazonaws.com/uifaces/faces/twitter/russoedu/128.jpg");
-        avatar.put("id11", "https://s3.amazonaws.com/uifaces/faces/twitter/mrmoiree/128.jpg");
-        avatar.put("id12", "https://s3.amazonaws.com/uifaces/faces/twitter/hebertialmeida/128.jpg");
+        List<String> avatarReferences = Arrays.asList(
+                AVATAR_ID_7,
+                AVATAR_ID_8,
+                AVATAR_ID_9,
+                AVATAR_ID_10,
+                AVATAR_ID_11,
+                AVATAR_ID_12);
 
         Response response = given()
                 .when()
@@ -34,8 +42,12 @@ public class APITests {
                 .then()
                 .log().all()
                 .extract().response();
-        JsonPath jsonResponse = response.jsonPath();
-        Assert.assertEquals(jsonResponse.get("avatar"), avatar.get("avatar"), "Имена файлов-аватаров пользователей не совпадают");
+
+        List<Integer> jsonResponse = response.jsonPath().getList("data.avatar");
+        Assert.assertNotNull(jsonResponse);
+        Assert.assertFalse(jsonResponse.isEmpty());
+        Assert.assertEquals(jsonResponse,  avatarReferences, "Имена файлов-аватаров пользователей не совпадают");
+
     }
 
     @Test
@@ -82,6 +94,7 @@ public class APITests {
                 .then()
                 .log().all()
                 .extract().response();
+
         List<Integer> jsonResponse = response.jsonPath().getList("data.year");
         //сравниваем отсортированный jsonResponse, с тем, который получили
         Assert.assertEquals(jsonResponse.stream().sorted().collect(Collectors.toList()), jsonResponse);
